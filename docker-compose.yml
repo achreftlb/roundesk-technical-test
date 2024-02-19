@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+  front:
+    container_name: roundesk-technical-test-front
+    build: ./roundesk-technical-test-front
+    ports:
+      - "3001:3000"
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    command: npm start
+    volumes:
+      - ./roundesk-technical-test-front:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - api
+  api:
+    container_name: roundesk-technical-test-api
+    build: ./roundesk-technical-test-api/
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=100
+    command: npm run start:prod
+    volumes:
+      - ./roundesk-technical-test-api:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - db
+  db:
+    container_name: roundesk_technical_test_db
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./mysql.conf:/etc/mysql/conf.d/mysql_custom.cnf
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+
