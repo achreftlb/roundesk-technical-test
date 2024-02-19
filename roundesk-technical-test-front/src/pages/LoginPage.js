@@ -31,7 +31,6 @@ function LoginPage() {
             dispatch(setCredentials({ user: userData.user, token: userData.access_token }));
             history.push('/');
         } catch (err) {
-            console.log(err.data)
             setError(err.data ? err.data.message : 'Failed to login');
         }
     };
@@ -54,7 +53,7 @@ function LoginPage() {
                                 <input type="password" className="form-control" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                             </div>
 
-                            {error && <div className="alert alert-danger" role="alert">{error}</div>}
+                            {error && <div className="alert alert-danger" role="alert" dangerouslySetInnerHTML={{__html :Array.isArray(error)? error.join('<br/>') : error }}></div>}
                             <div className="form-goup">
                                 <button type="submit" className="form-control btn btn-primary rounded submit px-3">Login</button>
                             </div>
